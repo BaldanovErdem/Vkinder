@@ -28,21 +28,17 @@ def insert_data(first_name, last_name, vk_id, vk_link):
             VALUES ('{first_name}', '{last_name}', '{vk_id}', '{vk_link}');"""
         )
 
-def select(offset):
+def search_id(vk_id):
     with connection.cursor() as cursor:
         cursor.execute(
-            f"""SELECT first_name, last_name, vk_id, vk_link
-                FROM public.users
-                OFFSET '{offset}';"""
+            f"""SELECT count(vk_id)
+            FROM public.users
+            WHERE vk_id='{vk_id}';"""
         )
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
 
 def drop_table():
     with connection.cursor() as cursor:
         cursor.execute(
             """DROP TABLE IF EXISTS users CASCADE;"""
         )
-
-def creating_database():
-    drop_table()
-    create_table()

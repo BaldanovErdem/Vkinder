@@ -16,8 +16,8 @@ def get_button(text, color):
 keyboard = {
     "one_time": False,
     "buttons": [
-        [get_button('Поиск', 'primary')],
-        [get_button('Далее', 'secondary')]
+        [get_button('Новый кандидат', 'primary')],
+        [get_button('Очистить список просмотренных', 'secondary')]
     ]
 }
 
