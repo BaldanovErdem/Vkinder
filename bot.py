@@ -8,25 +8,25 @@ for event in bot.longpoll.listen():
         user_id = str(event.user_id)
         msg = event.text.lower()
         sender(user_id, msg.lower())
-        create_table()
-        first_name, sex, bdate, city = bot.get_user_info(user_id)
-        try:                           # а когда эти 100 анкет будут просмотрены автоматически (незаметно для пользователя) должен выполняться новый поиск (замечание проверяющего №3)
-            int(persons[offset + 1][2]) > 0
-        except:
-            persons = bot.find_insert_users(user_id, offset_1)
-            offset_1 = offset_1 + count
+        create_tables_orm(engine)
 
-        if request == 'новый кандидат':
-            for i in range(0, 1000):
-                if search_id(persons[offset][2]) == 0:  # условий задания, которое требует, чтобы пользователю повторно одна и та же анкета не приходила (замечание проверяющего №4)
-                    bot.find_persons(user_id, persons[offset])
-                    offset += 1
-                    break
-                else:
-                    offset += 1
+        if bot.get_user_info(user_id) and bot.number_of_persons(user_id, persons, offset):   # Исключения должны влиять на логику исполнения программы (замечание проверяющего №1)
+            first_name, sex, bdate, city = bot.get_user_info(user_id)
+            if persons == [] or persons[offset] == persons[-1]:               # применить обычное условие здесь (замечание проверяющего №3)
+                persons = bot.find_insert_users(user_id, offset_1)
+                offset_1 = offset_1 + count
 
-        elif request == 'очистить список просмотренных':
-            drop_table()
+            if request == 'новый кандидат':
+                for i in range(0, 1000):
+                    if search_id_orm(persons[offset][2]) == 0:
+                        bot.find_persons(user_id, persons[offset])
+                        offset += 1
+                        break
+                    else:
+                        offset += 1
 
-        else:
-            bot.write_message(event.user_id, 'Твоё сообщение непонятно')
+            elif request == 'очистить список просмотренных':
+                drop_tables_orm(engine)
+
+            else:
+                bot.write_message(event.user_id, 'Твоё сообщение непонятно')
